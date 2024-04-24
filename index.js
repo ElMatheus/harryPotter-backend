@@ -53,7 +53,11 @@ app.get('/witchers/:id', async (req, res) => {
 
 app.post('/witchers', async (req, res) => {
     try {
+        let bloods = ['puro', 'mestiço', 'trouxa']
         const { name, age, hogwartsHouse, skill, bloodStatus, patrono } = req.body;
+        if (!bloods.compare(bloodStatus)){
+            return res.status(400).send('Sangue inválido');
+        }
         await pool.query('INSERT INTO witchers (name, age, hogwartsHouse, skill, bloodStatus, patrono) VALUES ($1, $2, $3, $4, $5, $6)', [name, age, hogwartsHouse, skill, bloodStatus, patrono]);
         res.status(201).send({ mensagem: 'Bruxo criado com sucesso' });
     } catch (error) {
