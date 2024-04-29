@@ -23,7 +23,7 @@ const verifyWand = ({length}) => {
         return false;
     }
     return true;
-}
+};
 
 // witchers -----------------------------------------------------------------------------
 
