@@ -18,6 +18,12 @@ app.get('/', (req, res) => {
     res.send('A rota de teste esta funcionando!');
 });
 
+const verifyWand = ({length}) => {
+    if (length < 15 || length > 35) {
+        return false;
+    }
+    return true;
+}
 
 // witchers -----------------------------------------------------------------------------
 
@@ -99,6 +105,20 @@ app.put('/witchers/:id', async (req, res) => {
     }
 });
 
+app.get('/witchers/name/:name', async (req, res) => {
+    try {   
+        const { name } = req.params;
+        const result = await pool.query("SELECT * FROM witchers WHERE name = $1", [name]);
+        if (result.rowCount === 0) {
+            return res.status(404).send('Bruxo não encontrado');
+        }
+        res.json(result.rows[0]);
+    } catch (error) {
+        console.error('erro ao obter bruxo', error);
+        res.status(500).send('Erro ao obter o bruxo');
+    }
+});
+
 // wand -----------------------------------------------------------------------------
 
 app.get('/wand', async (req, res) => {
@@ -134,6 +154,9 @@ app.get('/wand/:id', async (req, res) => {
 app.post('/wand', async (req, res) => {
     try {
         const { material, length, core, manufacturingDate } = req.body;
+        if (!verifyWand({length})) {
+            return res.status(400).send('Tamanho de varinha inválido');
+        }
         await pool.query('INSERT INTO wand (material, length, core, manufacturingDate) VALUES ($1, $2, $3, $4)', [material, length, core, manufacturingDate]);
         res.status(201).send({ mensagem: 'Varinha criada com sucesso' });
     } catch (error) {
